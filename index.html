@@ -2,12 +2,16 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Kamus </title>
+
+  <!-- ✅ POIN 1: Judul tab browser -->
+  <title>Kamus Bahasa Sirkel</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      background: linear-gradient(135deg, #e3f2fd, #fce4ec, #e8f5e9);
       padding: 20px;
+      min-height: 100vh;
     }
 
     h1 {
@@ -19,16 +23,25 @@
       padding: 12px;
       margin: 20px 0;
       font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      border-radius: 10px;
+      border: none;
+      outline: none;
     }
 
     .card {
       background: white;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 12px;
       margin-bottom: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+      /* ✅ POIN 3: animasi halus */
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
     }
 
     .kata {
@@ -42,49 +55,94 @@
     }
   </style>
 </head>
+
 <body>
 
   <h1>📘 Kamus Bahasa Sirkel</h1>
 
-  <input type="text" id="search" placeholder="Cari kata sirkel..." onkeyup="cariKata()">
+  <input
+    type="text"
+    id="search"
+    placeholder="Cari kata sirkel..."
+    onkeyup="cariKata()"
+  >
 
   <div id="kamus"></div>
 
   <script>
-    const dataKamus = [
-      { kata: "mbuy", arti: "azki cuman lebih gacor" },
-      { kata: "kenzo", arti: "penyepong hartop" },
-      { kata: "abfay", arti: "el cikup" },
-      { kata: "igx", arti: "padang perantau" },
-      { kata: "ngigax", arti: "isi sendiri" },
-      { kata: "aurigoon", arti: "prime iga" },
-      { kata: "maskeen", arti: "orang orangan mun" },
-      { kata: "m.k", arti: "prime maskeen" },
-      { kata: "sekjen", arti: "jabatan pak m.k" },
-      { kata: "ngembuy", arti: "isi sendiri" },
-      { kata: "wangsaff", arti: "prime rehan" },
-      { kata: "ding dong", arti: "rehan bromo" },
-      { kata: "vp", arti: "isi sendiri" },
-      { kata: "si bro", arti: "isi sendiri" },
-      { kata: "crypto", arti: "isi sendiri" },
-      { kata: "reza setrum", arti: "isi sendiri" },
-      { kata: "ramen", arti: "eittsss" },
-      { kata: "jica", arti: "tanya abfay" },
-      { kata: "haura nadine", arti: "yang ke rumah kenzo nobar avatar" },
-      { kata: "ibogeby", arti: "kak naya" },
-      { kata: "slek", arti: "berselisih" },
-      { kata: "geser", arti: "main warnet" },
-      { kata: "wcq", arti: "mobil abfay" },
-      { kata: "b 977 rs", arti: "mobil ngigax" },
-      { kata: "hartop", arti: "mobil kenzo" },
-      { kata: "medan", arti: "pak amir" },
-      { kata: "besi", arti: "pak amir" },
-      { kata: "alvin & the chipmunk", arti: "pak mochrim n the gang" },
-      { kata: "urqiqi", arti: "cwe arjut" },
-      { kata: "gendang", arti: "sebutan untuk orang dengan lingkar perut besar" },
-      { kata: "kentunk", arti: "sebutan
-  
+    let dataKamus = [
+      { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
+      { kata: "kenzo", arti: "(penyepong hartop)" },
+      { kata: "abfay", arti: "(el cikup)" },
+      { kata: "igx", arti: "(padang perantau)" },
+      { kata: "ngigax", arti: "(isi sendiri)" },
+      { kata: "aurigoon", arti: "(prime iga)" },
+      { kata: "maskeen", arti: "(orang orangan mun)" },
+      { kata: "m.k", arti: "(prime maskeen)" },
+      { kata: "sekjen", arti: "(jabatan pak m.k)" },
+      { kata: "ngembuy", arti: "(isi sendiri)" },
+      { kata: "wangsaff", arti: "(prime rehan)" },
+      { kata: "ding dong", arti: "(rehan bromo)" },
+      { kata: "vp", arti: "(isi sendiri)" },
+      { kata: "si bro", arti: "(isi sendiri)" },
+      { kata: "crypto", arti: "(isi sendiri)" },
+      { kata: "reza setrum", arti: "(isi sendiri)" },
+      { kata: "ramen", arti: "(eittsss)" },
+      { kata: "jica", arti: "(tanya abfay)" },
+      { kata: "haura nadine", arti: "(yang ke rumah kenzo nobar avatar)" },
+      { kata: "ibogeby", arti: "(kak naya)" },
+      { kata: "slek", arti: "(berselisih)" },
+      { kata: "geser", arti: "(main warnet)" },
+      { kata: "wcq", arti: "(mobil abfay)" },
+      { kata: "b 977 rs", arti: "(mobil ngigax)" },
+      { kata: "hartop", arti: "(mobil kenzo)" },
+      { kata: "medan", arti: "(pak amir)" },
+      { kata: "besi", arti: "(pak amir)" },
+      { kata: "alvin & the chipmunk", arti: "(pak mochrim n the gang)" },
+      { kata: "urqiqi", arti: "(cwe arjut)" },
+      { kata: "gendang", arti: "(lingkar perut besar)" },
+      { kata: "kentunk", arti: "(lingkar perut besar)" },
+      { kata: "gempa", arti: "(lingkar perut besar)" },
+      { kata: "tikum", arti: "(titik kumpul)" },
+      { kata: "mandi", arti: "(maen aer)" },
+      { kata: "kuyup", arti: "(maen aer)" }
+    ];
+
+    /* ✅ POIN 2: Sort A–Z lebih rapi (locale Indonesia) */
+    dataKamus.sort((a, b) =>
+      a.kata.localeCompare(b.kata, 'id', { sensitivity: 'base' })
+    );
+
+    const kamusDiv = document.getElementById("kamus");
+
+    function tampilkanKamus(data) {
+      kamusDiv.innerHTML = "";
+      data.forEach(item => {
+        kamusDiv.innerHTML += `
+          <div class="card">
+            <div class="kata">${item.kata}</div>
+            <div class="arti">${item.arti}</div>
+          </div>
+        `;
+      });
+    }
+
+    function cariKata() {
+      const keyword = document
+        .getElementById("search")
+        .value
+        .toLowerCase();
+
+      const hasil = dataKamus.filter(item =>
+        item.kata.toLowerCase().includes(keyword)
+      );
+
+      tampilkanKamus(hasil);
+    }
+
+    tampilkanKamus(dataKamus);
+  </script>
 
 </body>
-
 </html>
+
