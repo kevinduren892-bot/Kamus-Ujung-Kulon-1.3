@@ -2,75 +2,108 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-
-  <!-- ✅ POIN 1: Judul tab browser -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kamus Bahasa Sirkel</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #fce4ec, #e8f5e9);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       padding: 20px;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
     }
 
     h1 {
       text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 2rem;
     }
 
-    input {
+    .search-box {
       width: 100%;
-      padding: 12px;
-      margin: 20px 0;
+      padding: 15px 20px;
+      margin-bottom: 25px;
       font-size: 16px;
-      border-radius: 10px;
-      border: none;
+      border-radius: 25px;
+      border: 1px solid #ddd;
       outline: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+      border-color: #3498db;
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
     }
 
     .card {
       background: white;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-
-      /* ✅ POIN 3: animasi halus */
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border-left: 5px solid #3498db;
     }
 
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
 
     .kata {
       font-weight: bold;
-      font-size: 18px;
+      font-size: 1.2rem;
+      color: #2c3e50;
+      text-transform: capitalize;
     }
 
     .arti {
-      margin-top: 5px;
-      color: #555;
+      margin-top: 8px;
+      color: #5d6d7e;
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+      font-style: italic;
     }
   </style>
 </head>
-
 <body>
 
-  <h1>📘 Kamus Bahasa Sirkel</h1>
+  <div class="container">
+    <h1>📘 Kamus Sirkel</h1>
 
-  <input
-    type="text"
-    id="search"
-    placeholder="Cari kata sirkel..."
-    onkeyup="cariKata()"
-  >
+    <input 
+      type="text" 
+      id="search" 
+      class="search-box" 
+      placeholder="Cari kata sirkel kamu di sini..."
+    >
 
-  <div id="kamus"></div>
+    <div id="kamus"></div>
+  </div>
 
   <script>
-    let dataKamus = [
+    // Data tetap sama
+    const dataKamus = [
       { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
       { kata: "kenzo", arti: "(penyepong hartop)" },
       { kata: "abfay", arti: "(el cikup)" },
@@ -108,41 +141,42 @@
       { kata: "kuyup", arti: "(maen aer)" }
     ];
 
-    /* ✅ POIN 2: Sort A–Z lebih rapi (locale Indonesia) */
-    dataKamus.sort((a, b) =>
-      a.kata.localeCompare(b.kata, 'id', { sensitivity: 'base' })
-    );
+    // Urutkan data secara Alphabetis (A-Z)
+    dataKamus.sort((a, b) => a.kata.localeCompare(b.kata, 'id'));
 
     const kamusDiv = document.getElementById("kamus");
+    const searchInput = document.getElementById("search");
 
+    // Fungsi Render yang lebih efisien
     function tampilkanKamus(data) {
-      kamusDiv.innerHTML = "";
-      data.forEach(item => {
-        kamusDiv.innerHTML += `
-          <div class="card">
-            <div class="kata">${item.kata}</div>
-            <div class="arti">${item.arti}</div>
-          </div>
-        `;
-      });
+      if (data.length === 0) {
+        kamusDiv.innerHTML = `<div class="empty-state">Kata tidak ditemukan... 🧐</div>`;
+        return;
+      }
+
+      kamusDiv.innerHTML = data.map(item => `
+        <div class="card">
+          <div class="kata">${item.kata}</div>
+          <div class="arti">${item.arti}</div>
+        </div>
+      `).join('');
     }
 
-    function cariKata() {
-      const keyword = document
-        .getElementById("search")
-        .value
-        .toLowerCase();
-
-      const hasil = dataKamus.filter(item =>
-        item.kata.toLowerCase().includes(keyword)
+    // Fungsi Pencarian
+    searchInput.addEventListener('input', (e) => {
+      const keyword = e.target.value.toLowerCase();
+      const hasil = dataKamus.filter(item => 
+        item.kata.toLowerCase().includes(keyword) || 
+        item.arti.toLowerCase().includes(keyword)
       );
-
       tampilkanKamus(hasil);
-    }
+    });
 
+    // Jalankan render pertama kali
     tampilkanKamus(dataKamus);
   </script>
 
 </body>
 </html>
+
 
