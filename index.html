@@ -7,51 +7,46 @@
   <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/337/blue-book_1f4d8.png">
 
   <style>
-    :root { --primary: #1a73e8; --bg: #f0f2f5; }
+    :root { --primary: #1a73e8; --bg: #f8f9fa; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 650px; }
-    h1 { text-align: center; color: var(--primary); margin-bottom: 10px; }
-    .stats { text-align: center; color: #5f6368; margin-bottom: 20px; font-size: 0.9rem; }
-
-    /* Input Tambah Kata */
-    .add-section { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 10px; flex-wrap: wrap; }
-    .add-section input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-    .btn-add { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-    /* Search Bar */
-    .search-box { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 25px; border: 2px solid var(--primary); outline: none; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
-    /* Cards */
-    .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; transition: 0.3s; border-left: 6px solid var(--primary); }
-    .card:hover { transform: translateY(-3px); }
-    .kata { font-weight: bold; color: #202124; font-size: 1.1rem; }
-    .arti { color: #5f6368; margin-top: 5px; line-height: 1.4; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 600px; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 15px; }
     
-    .btn-copy { position: absolute; top: 15px; right: 15px; background: #f1f3f4; border: none; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; color: var(--primary); }
-    .btn-copy:active { background: #d1d3d4; }
-    .empty { text-align: center; padding: 50px; color: #9aa0a6; }
+    /* Box Tambah Kata */
+    .add-box { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; gap: 8px; }
+    .add-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+    .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* Search */
+    .search-input { width: 100%; padding: 15px; border-radius: 30px; border: 2px solid var(--primary); margin-bottom: 20px; outline: none; font-size: 1rem; }
+
+    /* Card */
+    .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 6px solid var(--primary); position: relative; transition: 0.2s; }
+    .card:hover { transform: scale(1.01); }
+    .kata { font-weight: bold; font-size: 1.1rem; color: #333; }
+    .arti { color: #666; margin-top: 4px; font-style: italic; }
+    .btn-copy { position: absolute; right: 10px; top: 10px; font-size: 0.7rem; padding: 4px 8px; cursor: pointer; background: #eee; border: none; border-radius: 4px; color: var(--primary); }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h1>📘 Kamus Ujung Kulon</h1>
-  <div id="stats" class="stats">Memuat data...</div>
-
-  <div class="add-section">
-    <input type="text" id="newKata" placeholder="Kata baru...">
-    <input type="text" id="newArti" placeholder="Artinya...">
-    <button class="btn-add" onclick="tambahData()">Tambah</button>
+  
+  <div class="add-box">
+    <input type="text" id="k" placeholder="Kata baru...">
+    <input type="text" id="a" placeholder="Arti...">
+    <button class="btn-add" onclick="add()">+</button>
   </div>
 
-  <input type="text" id="search" class="search-box" placeholder="Cari kata atau arti...">
-
-  <div id="kamus"></div>
+  <input type="text" id="s" class="search-input" placeholder="Cari kata sirkel..." oninput="search()">
+  
+  <div id="list"></div>
 </div>
 
 <script>
-  // DAFTAR KATA LENGKAP SESUAI KIRIMAN AWAL
+  // DAFTAR KATA LENGKAP
   const dataAwal = [
     { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
     { kata: "kenzo", arti: "(penyepong hartop)" },
@@ -90,65 +85,43 @@
     { kata: "kuyup", arti: "(maen aer)" }
   ];
 
-  // Ambil data dari LocalStorage agar kata yang ditambah manual tidak hilang
-  let dataKamus = JSON.parse(localStorage.getItem('ujungKulonData')) || dataAwal;
+  // PERBAIKAN DI SINI: Memakai dataAwal, bukan baseData
+  let localData = JSON.parse(localStorage.getItem('ujungKulon')) || dataAwal;
 
-  const kamusDiv = document.getElementById("kamus");
-  const statsDiv = document.getElementById("stats");
-
-  function renderKamus(data) {
-    data.sort((a, b) => a.kata.localeCompare(b.kata, 'id'));
-    statsDiv.innerHTML = `Total: <b>${data.length}</b> kata terdaftar`;
-
-    if (data.length === 0) {
-      kamusDiv.innerHTML = `<div class="empty">Kata tidak ditemukan... 🕵️‍♂️</div>`;
-      return;
-    }
-
-    kamusDiv.innerHTML = data.map((item) => `
+  function show(data) {
+    data.sort((x, y) => x.kata.localeCompare(y.kata));
+    document.getElementById('list').innerHTML = data.map(i => `
       <div class="card">
-        <button class="btn-copy" onclick="copyText('${item.kata}', '${item.arti}')">Salin</button>
-        <div class="kata">${item.kata}</div>
-        <div class="arti">${item.arti}</div>
+        <button class="btn-copy" onclick="cp('${i.kata}','${i.arti}')">Salin</button>
+        <div class="kata">${i.kata}</div>
+        <div class="arti">${i.arti}</div>
       </div>
     `).join('');
   }
 
-  function tambahData() {
-    const k = document.getElementById("newKata").value;
-    const a = document.getElementById("newArti").value;
-    if (k && a) {
-      dataKamus.push({ kata: k.toLowerCase(), arti: a });
-      localStorage.setItem('ujungKulonData', JSON.stringify(dataKamus));
-      renderKamus(dataKamus);
-      document.getElementById("newKata").value = "";
-      document.getElementById("newArti").value = "";
-    } else {
-      alert("Isi kata dan artinya dulu!");
+  function add() {
+    let k = document.getElementById('k').value;
+    let a = document.getElementById('a').value;
+    if(k && a) {
+      localData.push({kata: k.toLowerCase(), arti: a});
+      localStorage.setItem('ujungKulon', JSON.stringify(localData));
+      show(localData);
+      document.getElementById('k').value = ''; 
+      document.getElementById('a').value = '';
     }
   }
 
-  function copyText(kata, arti) {
-    const text = `${kata}: ${arti}`;
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Tersalin ke chat: " + text);
-    });
+  function search() {
+    let q = document.getElementById('s').value.toLowerCase();
+    show(localData.filter(i => i.kata.toLowerCase().includes(q) || i.arti.toLowerCase().includes(q)));
   }
 
-  document.getElementById("search").addEventListener("input", (e) => {
-    const s = e.target.value.toLowerCase();
-    const filter = dataKamus.filter(i => i.kata.toLowerCase().includes(s) || i.arti.toLowerCase().includes(s));
-    renderKamus(filter);
-  });
+  function cp(k, a) {
+    navigator.clipboard.writeText(`${k}: ${a}`);
+    alert('Tersalin ke chat!');
+  }
 
-  renderKamus(dataKamus);
+  show(localData);
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
