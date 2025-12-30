@@ -4,177 +4,207 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kamus Ujung Kulon</title>
+  <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/337/blue-book_1f4d8.png">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
       padding: 20px;
-      min-height: 100vh;
       display: flex;
       justify-content: center;
     }
+    .container { width: 100%; max-width: 650px; }
+    
+    h1 { text-align: center; color: #1a73e8; margin-bottom: 10px; }
+    .stats { text-align: center; color: #5f6368; margin-bottom: 20px; font-size: 0.9rem; }
 
-    .container {
-      width: 100%;
-      max-width: 600px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #2c3e50;
+    /* Form Tambah Kata */
+    .add-section {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 15px;
       margin-bottom: 20px;
-      font-size: 2rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
+    .add-section input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+    }
+    .btn-add {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-add:hover { background: #1557b0; }
 
+    /* Search Bar */
     .search-box {
       width: 100%;
-      padding: 15px 20px;
-      margin-bottom: 25px;
-      font-size: 16px;
+      padding: 15px;
+      margin-bottom: 20px;
       border-radius: 25px;
-      border: 1px solid #ddd;
+      border: 2px solid #1a73e8;
       outline: none;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: all 0.3s ease;
+      font-size: 1rem;
     }
 
-    .search-box:focus {
-      border-color: #3498db;
-      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
-    }
-
+    /* Cards */
     .card {
       background: white;
-      padding: 18px;
+      padding: 20px;
       border-radius: 15px;
       margin-bottom: 12px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      border-left: 5px solid #3498db;
+      position: relative;
+      transition: 0.3s;
     }
+    .card:hover { transform: scale(1.02); }
+    .kata { font-weight: bold; color: #202124; font-size: 1.1rem; }
+    .arti { color: #5f6368; margin-top: 5px; }
+    
+    .btn-copy {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #f1f3f4;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: #1a73e8;
+    }
+    .btn-copy:hover { background: #e8f0fe; }
 
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-    }
-
-    .kata {
-      font-weight: bold;
-      font-size: 1.2rem;
-      color: #2c3e50;
-      text-transform: capitalize;
-    }
-
-    .arti {
-      margin-top: 8px;
-      color: #5d6d7e;
-      line-height: 1.5;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #7f8c8d;
-      font-style: italic;
-    }
+    .empty { text-align: center; padding: 50px; color: #9aa0a6; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>📘 Kamus Sirkel</h1>
+<div class="container">
+  <h1>📘 Kamus Sirkel</h1>
+  <div id="stats" class="stats">Memuat data...</div>
 
-    <input 
-      type="text" 
-      id="search" 
-      class="search-box" 
-      placeholder="Cari kata sirkel kamu di sini..."
-    >
-
-    <div id="kamus"></div>
+  <div class="add-section">
+    <input type="text" id="newKata" placeholder="Kata baru...">
+    <input type="text" id="newArti" placeholder="Artinya...">
+    <button class="btn-add" onclick="tambahData()">Tambah</button>
   </div>
 
-  <script>
-    // Data tetap sama
-    const dataKamus = [
-      { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
-      { kata: "kenzo", arti: "(penyepong hartop)" },
-      { kata: "abfay", arti: "(el cikup)" },
-      { kata: "igx", arti: "(padang perantau)" },
-      { kata: "ngigax", arti: "(isi sendiri)" },
-      { kata: "aurigoon", arti: "(prime iga)" },
-      { kata: "maskeen", arti: "(orang orangan mun)" },
-      { kata: "m.k", arti: "(prime maskeen)" },
-      { kata: "sekjen", arti: "(jabatan pak m.k)" },
-      { kata: "ngembuy", arti: "(isi sendiri)" },
-      { kata: "wangsaff", arti: "(prime rehan)" },
-      { kata: "ding dong", arti: "(rehan bromo)" },
-      { kata: "vp", arti: "(isi sendiri)" },
-      { kata: "si bro", arti: "(isi sendiri)" },
-      { kata: "crypto", arti: "(isi sendiri)" },
-      { kata: "reza setrum", arti: "(isi sendiri)" },
-      { kata: "ramen", arti: "(eittsss)" },
-      { kata: "jica", arti: "(tanya abfay)" },
-      { kata: "haura nadine", arti: "(yang ke rumah kenzo nobar avatar)" },
-      { kata: "ibogeby", arti: "(kak naya)" },
-      { kata: "slek", arti: "(berselisih)" },
-      { kata: "geser", arti: "(main warnet)" },
-      { kata: "wcq", arti: "(mobil abfay)" },
-      { kata: "b 977 rs", arti: "(mobil ngigax)" },
-      { kata: "hartop", arti: "(mobil kenzo)" },
-      { kata: "medan", arti: "(pak amir)" },
-      { kata: "besi", arti: "(pak amir)" },
-      { kata: "alvin & the chipmunk", arti: "(pak mochrim n the gang)" },
-      { kata: "urqiqi", arti: "(cwe arjut)" },
-      { kata: "gendang", arti: "(lingkar perut besar)" },
-      { kata: "kentunk", arti: "(lingkar perut besar)" },
-      { kata: "gempa", arti: "(lingkar perut besar)" },
-      { kata: "tikum", arti: "(titik kumpul)" },
-      { kata: "mandi", arti: "(maen aer)" },
-      { kata: "kuyup", arti: "(maen aer)" }
-    ];
+  <input type="text" id="search" class="search-box" placeholder="Cari bahasa sirkel kamu...">
 
-    // Urutkan data secara Alphabetis (A-Z)
-    dataKamus.sort((a, b) => a.kata.localeCompare(b.kata, 'id'));
+  <div id="kamus"></div>
+</div>
 
-    const kamusDiv = document.getElementById("kamus");
-    const searchInput = document.getElementById("search");
+<script>
+  // Data awal
+  let dataKamus = [
+    { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
+    { kata: "kenzo", arti: "(penyepong hartop)" },
+    { kata: "abfay", arti: "(el cikup)" },
+    { kata: "igx", arti: "(padang perantau)" },
+    { kata: "ngigax", arti: "(isi sendiri)" },
+    { kata: "aurigoon", arti: "(prime iga)" },
+    { kata: "maskeen", arti: "(orang orangan mun)" },
+    { kata: "m.k", arti: "(prime maskeen)" },
+    { kata: "sekjen", arti: "(jabatan pak m.k)" },
+    { kata: "ngembuy", arti: "(isi sendiri)" },
+    { kata: "wangsaff", arti: "(prime rehan)" },
+    { kata: "ding dong", arti: "(rehan bromo)" },
+    { kata: "vp", arti: "(isi sendiri)" },
+    { kata: "si bro", arti: "(isi sendiri)" },
+    { kata: "crypto", arti: "(isi sendiri)" },
+    { kata: "reza setrum", arti: "(isi sendiri)" },
+    { kata: "ramen", arti: "(eittsss)" },
+    { kata: "jica", arti: "(tanya abfay)" },
+    { kata: "haura nadine", arti: "(yang ke rumah kenzo nobar avatar)" },
+    { kata: "ibogeby", arti: "(kak naya)" },
+    { kata: "slek", arti: "(berselisih)" },
+    { kata: "geser", arti: "(main warnet)" },
+    { kata: "wcq", arti: "(mobil abfay)" },
+    { kata: "b 977 rs", arti: "(mobil ngigax)" },
+    { kata: "hartop", arti: "(mobil kenzo)" },
+    { kata: "medan", arti: "(pak amir)" },
+    { kata: "besi", arti: "(pak amir)" },
+    { kata: "alvin & the chipmunk", arti: "(pak mochrim n the gang)" },
+    { kata: "urqiqi", arti: "(cwe arjut)" },
+    { kata: "gendang", arti: "(lingkar perut besar)" },
+    { kata: "kentunk", arti: "(lingkar perut besar)" },
+    { kata: "gempa", arti: "(lingkar perut besar)" },
+    { kata: "tikum", arti: "(titik kumpul)" },
+    { kata: "mandi", arti: "(maen aer)" },
+    { kata: "kuyup", arti: "(maen aer)" }
+  ];
 
-    // Fungsi Render yang lebih efisien
-    function tampilkanKamus(data) {
-      if (data.length === 0) {
-        kamusDiv.innerHTML = `<div class="empty-state">Kata tidak ditemukan... 🧐</div>`;
-        return;
-      }
+  const kamusDiv = document.getElementById("kamus");
+  const statsDiv = document.getElementById("stats");
 
-      kamusDiv.innerHTML = data.map(item => `
-        <div class="card">
-          <div class="kata">${item.kata}</div>
-          <div class="arti">${item.arti}</div>
-        </div>
-      `).join('');
+  function renderKamus(data) {
+    // Sort otomatis setiap render
+    data.sort((a, b) => a.kata.localeCompare(b.kata, 'id'));
+    
+    statsDiv.innerHTML = `Total: <b>${data.length}</b> kata sirkel terdaftar`;
+
+    if (data.length === 0) {
+      kamusDiv.innerHTML = `<div class="empty">Kata tidak ditemukan... 🕵️‍♂️</div>`;
+      return;
     }
 
-    // Fungsi Pencarian
-    searchInput.addEventListener('input', (e) => {
-      const keyword = e.target.value.toLowerCase();
-      const hasil = dataKamus.filter(item => 
-        item.kata.toLowerCase().includes(keyword) || 
-        item.arti.toLowerCase().includes(keyword)
-      );
-      tampilkanKamus(hasil);
-    });
+    kamusDiv.innerHTML = data.map((item, index) => `
+      <div class="card">
+        <button class="btn-copy" onclick="copyText('${item.kata}', '${item.arti}')">Salin</button>
+        <div class="kata">${item.kata}</div>
+        <div class="arti">${item.arti}</div>
+      </div>
+    `).join('');
+  }
 
-    // Jalankan render pertama kali
-    tampilkanKamus(dataKamus);
-  </script>
+  // Fungsi Tambah Data
+  function tambahData() {
+    const k = document.getElementById("newKata").value;
+    const a = document.getElementById("newArti").value;
+
+    if (k && a) {
+      dataKamus.push({ kata: k.toLowerCase(), arti: a.toLowerCase() });
+      document.getElementById("newKata").value = "";
+      document.getElementById("newArti").value = "";
+      renderKamus(dataKamus);
+      alert("Kata berhasil ditambahkan ke daftar!");
+    } else {
+      alert("Isi kata dan artinya dulu bro!");
+    }
+  }
+
+  // Fungsi Copy
+  function copyText(kata, arti) {
+    const text = `${kata}: ${arti}`;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Berhasil disalin: " + text);
+    });
+  }
+
+  // Event Search
+  document.getElementById("search").addEventListener("input", (e) => {
+    const s = e.target.value.toLowerCase();
+    const filter = dataKamus.filter(i => i.kata.includes(s) || i.arti.includes(s));
+    renderKamus(filter);
+  });
+
+  // Load awal
+  renderKamus(dataKamus);
+</script>
 
 </body>
 </html>
