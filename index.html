@@ -7,7 +7,7 @@
   <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/337/blue-book_1f4d8.png">
 
   <style>
-    /* Background baru yang lebih berwarna (Gradient) */
+    /* Background Gradient Berwarna */
     :root { 
       --primary: #6c5ce7; 
       --secondary: #a29bfe;
@@ -36,7 +36,7 @@
       font-size: 2.5rem;
     }
 
-    /* Search Bar lebih transparan & modern */
+    /* Search Bar Modern */
     .search-input { 
       width: 100%; 
       padding: 15px 25px; 
@@ -49,7 +49,7 @@
       background: rgba(255, 255, 255, 0.9);
     }
 
-    /* Card dengan efek Glassmorphism */
+    /* Card Glassmorphism */
     .card { 
       background: rgba(255, 255, 255, 0.9); 
       padding: 20px; 
@@ -88,15 +88,15 @@
 <body>
 
 <div class="container">
-  <h1>📘 Kamus Sirkel</h1>
+  <h1>📘 Kamus Ujung Kulon</h1>
   
-  <input type="text" id="s" class="search-input" placeholder="Cari kata sirkel..." oninput="search()">
+  <input type="text" id="s" class="search-input" placeholder="Cari kata Ujung Kulon..." oninput="search()">
   
   <div id="list"></div>
 </div>
 
 <script>
-  // DAFTAR KATA LENGKAP + UPDATE TERBARU
+  // DAFTAR KATA LENGKAP
   const dataKamus = [
     { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
     { kata: "kenzo", arti: "(penyepong hartop)" },
@@ -133,18 +133,16 @@
     { kata: "tikum", arti: "(titik kumpul)" },
     { kata: "mandi", arti: "(maen aer)" },
     { kata: "kuyup", arti: "(maen aer)" },
-    // KATA BARU REQUEST KAMU:
     { kata: "kus", arti: "(tikus)" },
     { kata: "bakso", arti: "(lingkar perut besar)" }
   ];
 
   function show(data) {
-    // Urutkan A-Z
     data.sort((x, y) => x.kata.localeCompare(y.kata));
     
     const container = document.getElementById('list');
     if (data.length === 0) {
-      container.innerHTML = `<div class="empty">Kata ga ada di database sirkel... 🕵️‍♂️</div>`;
+      container.innerHTML = `<div class="empty">Kata ga ada di database Ujung Kulon... 🕵️‍♂️</div>`;
       return;
     }
 
@@ -168,10 +166,9 @@
 
   function cp(k, a) {
     navigator.clipboard.writeText(`${k}: ${a}`);
-    alert('Berhasil disalin!');
+    alert('Tersalin ke chat!');
   }
 
-  // Tampilkan data pertama kali
   show(dataKamus);
 </script>
 </body>
