@@ -7,47 +7,97 @@
   <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/337/blue-book_1f4d8.png">
 
   <style>
-    :root { --primary: #1a73e8; --bg: #f8f9fa; }
+    /* Background baru yang lebih berwarna (Gradient) */
+    :root { 
+      --primary: #6c5ce7; 
+      --secondary: #a29bfe;
+      --bg: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); 
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
+
+    body { 
+      font-family: 'Segoe UI', Tahoma, sans-serif; 
+      background: var(--bg); 
+      background-attachment: fixed;
+      padding: 20px; 
+      display: flex; 
+      justify-content: center; 
+      min-height: 100vh;
+    }
+
     .container { width: 100%; max-width: 600px; }
-    h1 { text-align: center; color: var(--primary); margin-bottom: 15px; }
-    
-    /* Box Tambah Kata */
-    .add-box { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; gap: 8px; }
-    .add-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-    .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    /* Search */
-    .search-input { width: 100%; padding: 15px; border-radius: 30px; border: 2px solid var(--primary); margin-bottom: 20px; outline: none; font-size: 1rem; }
+    h1 { 
+      text-align: center; 
+      color: white; 
+      margin-bottom: 20px; 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      font-size: 2.5rem;
+    }
 
-    /* Card */
-    .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 6px solid var(--primary); position: relative; transition: 0.2s; }
-    .card:hover { transform: scale(1.01); }
-    .kata { font-weight: bold; font-size: 1.1rem; color: #333; }
-    .arti { color: #666; margin-top: 4px; font-style: italic; }
-    .btn-copy { position: absolute; right: 10px; top: 10px; font-size: 0.7rem; padding: 4px 8px; cursor: pointer; background: #eee; border: none; border-radius: 4px; color: var(--primary); }
+    /* Search Bar lebih transparan & modern */
+    .search-input { 
+      width: 100%; 
+      padding: 15px 25px; 
+      border-radius: 30px; 
+      border: none; 
+      margin-bottom: 25px; 
+      outline: none; 
+      font-size: 1.1rem; 
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Card dengan efek Glassmorphism */
+    .card { 
+      background: rgba(255, 255, 255, 0.9); 
+      padding: 20px; 
+      border-radius: 15px; 
+      margin-bottom: 15px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+      border-left: 8px solid var(--primary); 
+      position: relative; 
+      transition: 0.3s;
+    }
+
+    .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+    .kata { font-weight: bold; font-size: 1.2rem; color: #2d3436; text-transform: lowercase; }
+    .arti { color: #636e72; margin-top: 6px; font-style: italic; font-size: 1rem; }
+
+    .btn-copy { 
+      position: absolute; 
+      right: 15px; 
+      top: 15px; 
+      font-size: 0.75rem; 
+      padding: 6px 12px; 
+      cursor: pointer; 
+      background: var(--secondary); 
+      color: white;
+      border: none; 
+      border-radius: 20px; 
+      transition: 0.2s;
+    }
+
+    .btn-copy:hover { background: var(--primary); }
+
+    .empty { text-align: center; color: white; margin-top: 50px; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>📘 Kamus Ujung Kulon</h1>
+  <h1>📘 Kamus Sirkel</h1>
   
-  <div class="add-box">
-    <input type="text" id="k" placeholder="Kata baru...">
-    <input type="text" id="a" placeholder="Arti...">
-    <button class="btn-add" onclick="add()">+</button>
-  </div>
-
   <input type="text" id="s" class="search-input" placeholder="Cari kata sirkel..." oninput="search()">
   
   <div id="list"></div>
 </div>
 
 <script>
-  // DAFTAR KATA LENGKAP
-  const dataAwal = [
+  // DAFTAR KATA LENGKAP + UPDATE TERBARU
+  const dataKamus = [
     { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
     { kata: "kenzo", arti: "(penyepong hartop)" },
     { kata: "abfay", arti: "(el cikup)" },
@@ -82,15 +132,23 @@
     { kata: "gempa", arti: "(lingkar perut besar)" },
     { kata: "tikum", arti: "(titik kumpul)" },
     { kata: "mandi", arti: "(maen aer)" },
-    { kata: "kuyup", arti: "(maen aer)" }
+    { kata: "kuyup", arti: "(maen aer)" },
+    // KATA BARU REQUEST KAMU:
+    { kata: "kus", arti: "(tikus)" },
+    { kata: "bakso", arti: "(lingkar perut besar)" }
   ];
 
-  // PERBAIKAN DI SINI: Memakai dataAwal, bukan baseData
-  let localData = JSON.parse(localStorage.getItem('ujungKulon')) || dataAwal;
-
   function show(data) {
+    // Urutkan A-Z
     data.sort((x, y) => x.kata.localeCompare(y.kata));
-    document.getElementById('list').innerHTML = data.map(i => `
+    
+    const container = document.getElementById('list');
+    if (data.length === 0) {
+      container.innerHTML = `<div class="empty">Kata ga ada di database sirkel... 🕵️‍♂️</div>`;
+      return;
+    }
+
+    container.innerHTML = data.map(i => `
       <div class="card">
         <button class="btn-copy" onclick="cp('${i.kata}','${i.arti}')">Salin</button>
         <div class="kata">${i.kata}</div>
@@ -99,29 +157,23 @@
     `).join('');
   }
 
-  function add() {
-    let k = document.getElementById('k').value;
-    let a = document.getElementById('a').value;
-    if(k && a) {
-      localData.push({kata: k.toLowerCase(), arti: a});
-      localStorage.setItem('ujungKulon', JSON.stringify(localData));
-      show(localData);
-      document.getElementById('k').value = ''; 
-      document.getElementById('a').value = '';
-    }
-  }
-
   function search() {
     let q = document.getElementById('s').value.toLowerCase();
-    show(localData.filter(i => i.kata.toLowerCase().includes(q) || i.arti.toLowerCase().includes(q)));
+    const filtered = dataKamus.filter(i => 
+      i.kata.toLowerCase().includes(q) || 
+      i.arti.toLowerCase().includes(q)
+    );
+    show(filtered);
   }
 
   function cp(k, a) {
     navigator.clipboard.writeText(`${k}: ${a}`);
-    alert('Tersalin ke chat!');
+    alert('Berhasil disalin!');
   }
 
-  show(localData);
+  // Tampilkan data pertama kali
+  show(dataKamus);
 </script>
 </body>
 </html>
+
