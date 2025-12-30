@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kamus Ujung Kulon</title>
+  <title>Kamus Sirkel Pro</title>
   <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/337/blue-book_1f4d8.png">
 
   <style>
+    /* CSS tetap sama dengan tambahan sedikit aksen */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #f0f2f5;
       padding: 20px;
       display: flex;
       justify-content: center;
     }
     .container { width: 100%; max-width: 650px; }
-    
-    h1 { text-align: center; color: #1a73e8; margin-bottom: 10px; }
+    h1 { text-align: center; color: #1a73e8; margin-bottom: 5px; }
     .stats { text-align: center; color: #5f6368; margin-bottom: 20px; font-size: 0.9rem; }
 
-    /* Form Tambah Kata */
     .add-section {
       background: #ffffff;
       padding: 15px;
@@ -47,9 +46,7 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .btn-add:hover { background: #1557b0; }
 
-    /* Search Bar */
     .search-box {
       width: 100%;
       padding: 15px;
@@ -57,21 +54,18 @@
       border-radius: 25px;
       border: 2px solid #1a73e8;
       outline: none;
-      font-size: 1rem;
     }
 
-    /* Cards */
     .card {
       background: white;
       padding: 20px;
       border-radius: 15px;
       margin-bottom: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       position: relative;
       transition: 0.3s;
+      border-left: 5px solid #1a73e8;
     }
-    .card:hover { transform: scale(1.02); }
-    .kata { font-weight: bold; color: #202124; font-size: 1.1rem; }
+    .kata { font-weight: bold; color: #202124; font-size: 1.1rem; text-transform: capitalize; }
     .arti { color: #5f6368; margin-top: 5px; }
     
     .btn-copy {
@@ -86,9 +80,6 @@
       cursor: pointer;
       color: #1a73e8;
     }
-    .btn-copy:hover { background: #e8f0fe; }
-
-    .empty { text-align: center; padding: 50px; color: #9aa0a6; }
   </style>
 </head>
 <body>
@@ -103,14 +94,14 @@
     <button class="btn-add" onclick="tambahData()">Tambah</button>
   </div>
 
-  <input type="text" id="search" class="search-box" placeholder="Cari bahasa sirkel kamu...">
+  <input type="text" id="search" class="search-box" placeholder="Cari kata atau arti...">
 
   <div id="kamus"></div>
 </div>
 
 <script>
-  // Data awal
-  let dataKamus = [
+  // Data Default (Induk)
+  const defaultData = [
     { kata: "mbuy", arti: "(azki cuman lebih gacor)" },
     { kata: "kenzo", arti: "(penyepong hartop)" },
     { kata: "abfay", arti: "(el cikup)" },
@@ -120,49 +111,29 @@
     { kata: "maskeen", arti: "(orang orangan mun)" },
     { kata: "m.k", arti: "(prime maskeen)" },
     { kata: "sekjen", arti: "(jabatan pak m.k)" },
-    { kata: "ngembuy", arti: "(isi sendiri)" },
     { kata: "wangsaff", arti: "(prime rehan)" },
     { kata: "ding dong", arti: "(rehan bromo)" },
-    { kata: "vp", arti: "(isi sendiri)" },
-    { kata: "si bro", arti: "(isi sendiri)" },
-    { kata: "crypto", arti: "(isi sendiri)" },
-    { kata: "reza setrum", arti: "(isi sendiri)" },
     { kata: "ramen", arti: "(eittsss)" },
-    { kata: "jica", arti: "(tanya abfay)" },
-    { kata: "haura nadine", arti: "(yang ke rumah kenzo nobar avatar)" },
-    { kata: "ibogeby", arti: "(kak naya)" },
     { kata: "slek", arti: "(berselisih)" },
-    { kata: "geser", arti: "(main warnet)" },
-    { kata: "wcq", arti: "(mobil abfay)" },
-    { kata: "b 977 rs", arti: "(mobil ngigax)" },
-    { kata: "hartop", arti: "(mobil kenzo)" },
-    { kata: "medan", arti: "(pak amir)" },
-    { kata: "besi", arti: "(pak amir)" },
-    { kata: "alvin & the chipmunk", arti: "(pak mochrim n the gang)" },
-    { kata: "urqiqi", arti: "(cwe arjut)" },
-    { kata: "gendang", arti: "(lingkar perut besar)" },
-    { kata: "kentunk", arti: "(lingkar perut besar)" },
-    { kata: "gempa", arti: "(lingkar perut besar)" },
-    { kata: "tikum", arti: "(titik kumpul)" },
-    { kata: "mandi", arti: "(maen aer)" },
-    { kata: "kuyup", arti: "(maen aer)" }
+    { kata: "tikum", arti: "(titik kumpul)" }
   ];
+
+  // Ambil data dari LocalStorage atau pakai data default jika kosong
+  let dataKamus = JSON.parse(localStorage.getItem('myKamusData')) || defaultData;
 
   const kamusDiv = document.getElementById("kamus");
   const statsDiv = document.getElementById("stats");
 
   function renderKamus(data) {
-    // Sort otomatis setiap render
     data.sort((a, b) => a.kata.localeCompare(b.kata, 'id'));
-    
     statsDiv.innerHTML = `Total: <b>${data.length}</b> kata sirkel terdaftar`;
 
     if (data.length === 0) {
-      kamusDiv.innerHTML = `<div class="empty">Kata tidak ditemukan... 🕵️‍♂️</div>`;
+      kamusDiv.innerHTML = `<div style="text-align:center; padding:50px; color:gray;">Kata tidak ditemukan... 🕵️‍♂️</div>`;
       return;
     }
 
-    kamusDiv.innerHTML = data.map((item, index) => `
+    kamusDiv.innerHTML = data.map((item) => `
       <div class="card">
         <button class="btn-copy" onclick="copyText('${item.kata}', '${item.arti}')">Salin</button>
         <div class="kata">${item.kata}</div>
@@ -171,23 +142,25 @@
     `).join('');
   }
 
-  // Fungsi Tambah Data
   function tambahData() {
     const k = document.getElementById("newKata").value;
     const a = document.getElementById("newArti").value;
 
     if (k && a) {
       dataKamus.push({ kata: k.toLowerCase(), arti: a.toLowerCase() });
+      
+      // SIMPAN KE LOCAL STORAGE
+      localStorage.setItem('myKamusData', JSON.stringify(dataKamus));
+      
       document.getElementById("newKata").value = "";
       document.getElementById("newArti").value = "";
       renderKamus(dataKamus);
-      alert("Kata berhasil ditambahkan ke daftar!");
+      alert("Mantap! Kata tersimpan permanen di browser ini.");
     } else {
-      alert("Isi kata dan artinya dulu bro!");
+      alert("Isi dulu kolomnya!");
     }
   }
 
-  // Fungsi Copy
   function copyText(kata, arti) {
     const text = `${kata}: ${arti}`;
     navigator.clipboard.writeText(text).then(() => {
@@ -195,19 +168,18 @@
     });
   }
 
-  // Event Search
   document.getElementById("search").addEventListener("input", (e) => {
     const s = e.target.value.toLowerCase();
     const filter = dataKamus.filter(i => i.kata.includes(s) || i.arti.includes(s));
     renderKamus(filter);
   });
 
-  // Load awal
   renderKamus(dataKamus);
 </script>
 
 </body>
 </html>
+
 
 
 
